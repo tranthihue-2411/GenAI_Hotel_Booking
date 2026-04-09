@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use Illuminate\Http\Request;
+
+class AdminBookingController extends Controller
+{
+    private function checkAdmin()
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Bạn không có quyền truy cập.');
+        }
+    }
+
+    public function index(Request $request)
+    {
+        $this->checkAdmin();
+        $query = Booking::with(['hotel', 'room', 'user'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->where('check_in_date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('check_out_date', '<=', $request->date_to);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_reference', 'like', "%{$search}%")
+                  ->orWhere('guest_name', 'like', "%{$search}%")
+                  ->orWhere('guest_email', 'like', "%{$search}%")
+                  ->orWhereHas('hotel', function ($hotel) use ($search) {
+                      $hotel->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $bookings = $query->paginate(20);
+
+        return view('admin.bookings.index', compact('bookings'));
+    }
+
+    public function show(Booking $booking)
+    {
+        $this->checkAdmin();
+        $booking->load(['hotel', 'room', 'user']);
+        return view('admin.bookings.show', compact('booking'));
+    }
+
+    public function updateStatus(Request $request, Booking $booking)
+    {
+        $this->checkAdmin();
+        $validated = $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled,completed',
+        ]);
+
+        $booking->update(['status' => $validated['status']]);
+
+        if ($validated['status'] === 'cancelled') {
+            $booking->update([
+                'cancelled_at' => now(),
+                'cancellation_reason' => $request->reason ?? 'Cancelled by admin',
+            ]);
+        }
+
+        return back()->with('success', 'Đã cập nhật trạng thái đặt phòng!');
+    }
+}
