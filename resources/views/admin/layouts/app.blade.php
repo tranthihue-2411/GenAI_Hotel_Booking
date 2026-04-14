@@ -5,83 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin - HotelHub')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .sidebar-link.active {
+            background: #2563eb;
+        }
+    </style>
     @stack('styles')
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-100" style="display:flex; min-height:100vh;">
 
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <div class="w-64 bg-gray-900 text-white flex-shrink-0">
+<div style="display:flex; width:100%; min-height:100vh;">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside style="width:240px; min-width:240px; background:#0f172a; display:flex; flex-direction:column;">
+
         <!-- Logo -->
-        <div class="p-6 border-b border-gray-700">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-hotel text-blue-400 text-2xl"></i>
-                <span class="text-xl font-bold">HotelHub Admin</span>
-            </div>
+        <div style="padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <a href="{{ route('home') }}" class="flex items-center gap-2">
+                <div style="width:32px; height:32px; background:#2563eb; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-hotel text-white text-sm"></i>
+                </div>
+                <span style="font-weight:700; font-size:16px; color:#fff;">
+                    Hotel<span style="color:#60a5fa;">Hub</span>
+                </span>
+                <span style="font-size:10px; background:#2563eb; color:#fff; padding:2px 6px; border-radius:4px; margin-left:2px; font-weight:600;">
+                    ADMIN
+                </span>
+            </a>
         </div>
 
         <!-- Nav -->
-        <nav class="p-4 space-y-2">
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200
-                {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-tachometer-alt w-5"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="{{ route('admin.hotels.index') }}"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200
-                {{ request()->routeIs('admin.hotels.*') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-hotel w-5"></i>
-                <span>Quản lý khách sạn</span>
-            </a>
-            <a href="{{ route('admin.bookings.index') }}"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200
-                {{ request()->routeIs('admin.bookings.*') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-calendar-alt w-5"></i>
-                <span>Quản lý đặt phòng</span>
-            </a>
-            <div class="border-t border-gray-700 pt-4 mt-4">
-                <a href="{{ route('home') }}"
-                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200">
-                    <i class="fas fa-globe w-5"></i>
-                    <span>Về trang chủ</span>
-                </a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200 text-left">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Đăng xuất</span>
-                    </button>
-                </form>
-            </div>
-        </nav>
-    </div>
+        <nav style="padding:16px 12px; flex:1;">
+            <p style="font-size:10px; font-weight:600; color:#475569; text-transform:uppercase; letter-spacing:1px; padding:0 8px; margin-bottom:8px;">
+                Quản lý
+            </p>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+            <a href="{{ route('admin.dashboard') }}"
+                class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#94a3b8; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:4px;">
+                <i class="fas fa-tachometer-alt" style="width:16px; text-align:center;"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ route('admin.hotels.index') }}"
+                class="sidebar-link {{ request()->routeIs('admin.hotels.*') ? 'active' : '' }}"
+                style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#94a3b8; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:4px;">
+                <i class="fas fa-hotel" style="width:16px; text-align:center;"></i>
+                Quản lý khách sạn
+            </a>
+
+            <a href="{{ route('admin.bookings.index') }}"
+                class="sidebar-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
+                style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#94a3b8; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:4px;">
+                <i class="fas fa-calendar-alt" style="width:16px; text-align:center;"></i>
+                Quản lý đặt phòng
+            </a>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;"></div>
+
+            <a href="{{ route('home') }}"
+                class="sidebar-link"
+                style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#94a3b8; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:4px;">
+                <i class="fas fa-globe" style="width:16px; text-align:center;"></i>
+                Về trang chủ
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="sidebar-link"
+                    style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#f87171; font-size:14px; font-weight:500; width:100%; background:none; border:none; cursor:pointer; text-align:left; margin-bottom:4px;">
+                    <i class="fas fa-sign-out-alt" style="width:16px; text-align:center;"></i>
+                    Đăng xuất
+                </button>
+            </form>
+        </nav>
+
+        <!-- User Info -->
+        <div style="padding:16px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:34px; height:34px; background:#2563eb; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0;">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                </div>
+                <div style="min-width:0;">
+                    <p style="font-size:13px; font-weight:600; color:#f1f5f9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        {{ auth()->user()->name ?? 'Admin' }}
+                    </p>
+                    <p style="font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        {{ auth()->user()->email ?? '' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+
         <!-- Top Bar -->
-        <header class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-            <h1 class="text-xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h1>
-            <div class="flex items-center space-x-3">
-                <i class="fas fa-user-shield text-blue-600"></i>
-                <span class="text-gray-700 font-medium">{{ auth()->user()->name }}</span>
+        <header style="background:#fff; border-bottom:1px solid #f1f5f9; padding:0 24px; height:60px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+            <h1 style="font-size:18px; font-weight:700; color:#1e293b;">
+                @yield('page-title', 'Dashboard')
+            </h1>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:8px; height:8px; background:#22c55e; border-radius:50%;"></div>
+                <span style="font-size:13px; color:#64748b; font-weight:500;">Hệ thống đang hoạt động</span>
             </div>
         </header>
 
         <!-- Flash Messages -->
         @if(session('success'))
-        <div class="mx-6 mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
-            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+        <div style="margin:16px 24px 0;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; padding:12px 16px; border-radius:12px; display:flex; align-items:center; gap:8px; font-size:14px;">
+                <i class="fas fa-check-circle" style="color:#22c55e;"></i>
+                {{ session('success') }}
+            </div>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div style="margin:16px 24px 0;">
+            <div style="background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:12px 16px; border-radius:12px; display:flex; align-items:center; gap:8px; font-size:14px;">
+                <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>
+                {{ session('error') }}
+            </div>
         </div>
         @endif
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-y-auto p-6">
+        <main style="flex:1; padding:24px; overflow-y:auto;">
             @yield('content')
         </main>
     </div>
+
 </div>
 
 @stack('scripts')

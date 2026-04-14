@@ -3,112 +3,194 @@
 @section('title', 'Chi tiết đặt phòng - HotelHub')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 py-8">
-    <!-- Success Banner -->
-    <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8 text-center">
-        <i class="fas fa-check-circle text-green-500 text-5xl mb-3"></i>
-        <h1 class="text-2xl font-bold text-green-700">Đặt phòng thành công!</h1>
-        <p class="text-green-600 mt-1">Mã đặt phòng: <span class="font-bold">{{ $booking->booking_reference }}</span></p>
-    </div>
 
-    <!-- Booking Details -->
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-5 pb-3 border-b">Thông tin đặt phòng</h2>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <p class="text-gray-500 text-sm">Khách sạn</p>
-                <p class="font-medium text-gray-800">{{ $booking->hotel->name }}</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Loại phòng</p>
-                <p class="font-medium text-gray-800">{{ $booking->room->name }}</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Nhận phòng</p>
-                <p class="font-medium text-gray-800">{{ $booking->check_in_date->format('d/m/Y') }}</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Trả phòng</p>
-                <p class="font-medium text-gray-800">{{ $booking->check_out_date->format('d/m/Y') }}</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Số đêm</p>
-                <p class="font-medium text-gray-800">{{ $booking->number_of_nights }} đêm</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Số khách</p>
-                <p class="font-medium text-gray-800">{{ $booking->number_of_guests }} khách</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Tên khách</p>
-                <p class="font-medium text-gray-800">{{ $booking->guest_name }}</p>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Email</p>
-                <p class="font-medium text-gray-800">{{ $booking->guest_email }}</p>
-            </div>
+<!-- Page Header -->
+<div class="bg-white border-b border-slate-100">
+    <div class="max-w-4xl mx-auto px-6 py-5">
+        <div class="flex items-center gap-2 text-sm text-slate-400 mb-1">
+            <a href="{{ route('home') }}" class="hover:text-blue-600 transition-colors">Trang chủ</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="{{ route('bookings.index') }}" class="hover:text-blue-600 transition-colors">Đặt phòng của tôi</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-slate-600 font-medium">{{ $booking->booking_reference }}</span>
         </div>
-
-        <!-- Status -->
-        <div class="mt-4 pt-4 border-t">
-            <p class="text-gray-500 text-sm">Trạng thái</p>
-            <span class="inline-block mt-1 px-3 py-1 rounded-full text-sm font-medium
-                {{ $booking->status === 'confirmed' ? 'bg-green-100 text-green-700' : '' }}
-                {{ $booking->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                {{ $booking->status === 'cancelled' ? 'bg-red-100 text-red-700' : '' }}
-                {{ $booking->status === 'completed' ? 'bg-blue-100 text-blue-700' : '' }}">
-                {{ ucfirst($booking->status) }}
-            </span>
-        </div>
-    </div>
-
-    <!-- Price Summary -->
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-5 pb-3 border-b">Chi tiết thanh toán</h2>
-
-        <div class="space-y-3">
-            <div class="flex justify-between text-gray-600">
-                <span>${{ number_format($booking->room_price_per_night) }} x {{ $booking->number_of_nights }} đêm</span>
-                <span>${{ number_format($booking->subtotal) }}</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-                <span>Thuế (10%)</span>
-                <span>${{ number_format($booking->taxes) }}</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-                <span>Phí dịch vụ</span>
-                <span>${{ number_format($booking->service_fee) }}</span>
-            </div>
-            @if($booking->discount > 0)
-            <div class="flex justify-between text-green-600">
-                <span>Giảm giá</span>
-                <span>-${{ number_format($booking->discount) }}</span>
-            </div>
-            @endif
-            <div class="flex justify-between font-bold text-lg text-gray-800 pt-3 border-t">
-                <span>Tổng cộng</span>
-                <span class="text-blue-600">${{ number_format($booking->total_amount) }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="flex gap-4">
-        <a href="{{ route('bookings.index') }}"
-            class="flex-1 text-center bg-white border-2 border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 font-medium transition duration-200">
-            <i class="fas fa-list mr-2"></i>Xem tất cả đặt phòng
-        </a>
-        @if($booking->status !== 'cancelled')
-        <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="flex-1"
-            onsubmit="return confirm('Bạn có chắc muốn hủy đặt phòng này?')">
-            @csrf
-            <button type="submit"
-                class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 font-medium transition duration-200">
-                <i class="fas fa-times mr-2"></i>Hủy đặt phòng
-            </button>
-        </form>
-        @endif
+        <h1 class="text-2xl font-bold text-slate-800">Chi tiết đặt phòng</h1>
     </div>
 </div>
+
+<div class="max-w-4xl mx-auto px-6 py-8">
+
+    <!-- Success Banner -->
+    @if(session('success'))
+    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-emerald-600"></i>
+        </div>
+        <div>
+            <p class="font-semibold text-emerald-700">Đặt phòng thành công!</p>
+            <p class="text-emerald-600 text-sm">Mã đặt phòng: <span class="font-bold">{{ $booking->booking_reference }}</span></p>
+        </div>
+    </div>
+    @endif
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Cột trái -->
+        <div class="lg:col-span-2 space-y-5">
+
+            <!-- Booking Info -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
+                    <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-calendar-check text-blue-500 text-sm"></i>
+                        Thông tin đặt phòng
+                    </h2>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $booking->status === 'confirmed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : '' }}
+                        {{ $booking->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' : '' }}
+                        {{ $booking->status === 'cancelled' ? 'bg-red-50 text-red-500 border border-red-100' : '' }}
+                        {{ $booking->status === 'completed' ? 'bg-blue-50 text-blue-600 border border-blue-100' : '' }}">
+                        <i class="fas fa-circle text-xs mr-1"></i>{{ ucfirst($booking->status) }}
+                    </span>
+                </div>
+
+                <div class="p-6">
+                    <!-- Hotel & Room -->
+                    <div class="flex gap-4 mb-5 pb-5 border-b border-slate-50">
+                        <img src="{{ $booking->hotel->main_image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&h=150&fit=crop' }}"
+                            alt="{{ $booking->hotel->name }}"
+                            class="w-24 h-18 rounded-xl object-cover flex-shrink-0" style="height:72px;">
+                        <div>
+                            <h3 class="font-bold text-slate-800">{{ $booking->hotel->name }}</h3>
+                            <p class="text-slate-400 text-sm mt-0.5">
+                                <i class="fas fa-bed mr-1 text-slate-300"></i>{{ $booking->room->name }}
+                            </p>
+                            <p class="text-slate-400 text-xs mt-1">
+                                <i class="fas fa-hashtag mr-1 text-slate-300"></i>{{ $booking->booking_reference }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dates Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-5 pb-5 border-b border-slate-50">
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-slate-400 text-xs mb-1">
+                                <i class="fas fa-sign-in-alt mr-1 text-blue-400"></i>Nhận phòng
+                            </p>
+                            <p class="font-bold text-slate-800">{{ $booking->check_in_date->format('d/m/Y') }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-slate-400 text-xs mb-1">
+                                <i class="fas fa-sign-out-alt mr-1 text-blue-400"></i>Trả phòng
+                            </p>
+                            <p class="font-bold text-slate-800">{{ $booking->check_out_date->format('d/m/Y') }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-slate-400 text-xs mb-1">
+                                <i class="fas fa-moon mr-1 text-blue-400"></i>Số đêm
+                            </p>
+                            <p class="font-bold text-slate-800">{{ $booking->number_of_nights }} đêm</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-slate-400 text-xs mb-1">
+                                <i class="fas fa-user mr-1 text-blue-400"></i>Số khách
+                            </p>
+                            <p class="font-bold text-slate-800">{{ $booking->number_of_guests }} khách</p>
+                        </div>
+                    </div>
+
+                    <!-- Guest Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-slate-400 text-xs mb-1">Tên khách</p>
+                            <p class="font-semibold text-slate-700 text-sm">{{ $booking->guest_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs mb-1">Email</p>
+                            <p class="font-semibold text-slate-700 text-sm">{{ $booking->guest_email }}</p>
+                        </div>
+                        @if($booking->guest_phone)
+                        <div>
+                            <p class="text-slate-400 text-xs mb-1">Điện thoại</p>
+                            <p class="font-semibold text-slate-700 text-sm">{{ $booking->guest_phone }}</p>
+                        </div>
+                        @endif
+                        @if($booking->special_requests)
+                        <div class="col-span-2">
+                            <p class="text-slate-400 text-xs mb-1">Yêu cầu đặc biệt</p>
+                            <p class="font-semibold text-slate-700 text-sm">{{ $booking->special_requests }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <a href="{{ route('bookings.index') }}"
+                    class="flex-1 text-center border border-slate-200 text-slate-600 hover:bg-slate-50 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-list"></i> Tất cả đặt phòng
+                </a>
+                @if($booking->status !== 'cancelled' && $booking->status !== 'completed')
+                <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="flex-1"
+                    onsubmit="return confirm('Bạn có chắc muốn hủy đặt phòng này?')">
+                    @csrf
+                    <button type="submit"
+                        class="w-full border border-red-200 text-red-500 hover:bg-red-50 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-times-circle"></i> Hủy đặt phòng
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
+
+        <!-- Cột phải - Payment Summary -->
+        <div>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden sticky top-20">
+                <div class="bg-blue-600 px-6 py-5">
+                    <p class="text-blue-200 text-xs font-medium mb-1">Tổng thanh toán</p>
+                    <p class="text-white font-bold text-3xl">${{ number_format($booking->total_amount) }}</p>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">${{ number_format($booking->room_price_per_night) }} × {{ $booking->number_of_nights }} đêm</span>
+                        <span class="text-slate-700 font-medium">${{ number_format($booking->subtotal) }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Thuế (10%)</span>
+                        <span class="text-slate-700 font-medium">${{ number_format($booking->taxes) }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Phí dịch vụ</span>
+                        <span class="text-slate-700 font-medium">${{ number_format($booking->service_fee) }}</span>
+                    </div>
+                    @if($booking->discount > 0)
+                    <div class="flex justify-between text-sm">
+                        <span class="text-emerald-500">Giảm giá</span>
+                        <span class="text-emerald-500 font-medium">-${{ number_format($booking->discount) }}</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between font-bold text-slate-800 pt-3 border-t border-slate-100">
+                        <span>Tổng cộng</span>
+                        <span class="text-blue-600 text-lg">${{ number_format($booking->total_amount) }}</span>
+                    </div>
+                </div>
+
+                <!-- Trust -->
+                <div class="px-5 pb-5 space-y-2">
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <i class="fas fa-shield-alt text-emerald-500"></i>
+                        <span>Thanh toán an toàn & bảo mật</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <i class="fas fa-headset text-blue-500"></i>
+                        <span>Hỗ trợ 24/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
